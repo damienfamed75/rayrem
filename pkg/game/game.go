@@ -51,7 +51,7 @@ func NewGame() *Game {
 
 // SetScene changes the scene mode.
 func (g *Game) SetScene(mode common.Mode) {
-	g.world.Clear() // Clear the world of any remaining shapes.
+	// g.world.Clear() // Clear the world of any remaining shapes.
 	g.mode = mode
 }
 
