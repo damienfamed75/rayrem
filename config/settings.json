@@ -1,0 +1,18 @@
+{
+	"game": {
+		"gravity": 25
+	},
+	"player": {
+		"spritesheet": "player.json",
+		"friction": 0.5,
+		"jumpHeight": 6,
+		"maxSpeed": {
+			"X": 6,
+			"Y": 8
+		}
+	},
+	"camera": {
+		"zoom": 4,
+		"lerp": 0.2
+	}
+}
