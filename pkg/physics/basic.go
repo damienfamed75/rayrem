@@ -32,13 +32,13 @@ type BasicEntity struct {
 
 // NewBasicEntity returns a basic entity that loads in the sprite
 // based on the given spritesheet. Also creates and adds the rigidbody.
-func NewBasicEntity(collision, world *Space, maxSpeed r.Vector2, ase *aseprite.File) (*BasicEntity, error) {
+func NewBasicEntity(collision *Space, solids *SpatialHashmap, maxSpeed r.Vector2, ase *aseprite.File) (*BasicEntity, error) {
 	b := &BasicEntity{
 		Ase:       ase,
 		Color:     r.White,
 		Facing:    common.Right,
 		Scale:     1.0,
-		Rigidbody: NewBody(collision, world, maxSpeed),
+		Rigidbody: NewBody(collision, solids, maxSpeed),
 		Space:     NewSpace(),
 	}
 

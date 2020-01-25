@@ -1,6 +1,8 @@
 package physics
 
-import r "github.com/lachee/raylib-goplus/raylib"
+import (
+	r "github.com/lachee/raylib-goplus/raylib"
+)
 
 var (
 	_ Shape = &Space{}
@@ -40,7 +42,8 @@ func (s *Space) Width() float32 {
 	min := s.Position()
 	max := s.MaxPosition()
 
-	return min.X - max.X
+	return max.X - min.X
+	// return min.X - max.X
 }
 
 // Height gets the overall height from all the shapes combined.
@@ -48,7 +51,8 @@ func (s *Space) Height() float32 {
 	min := s.Position()
 	max := s.MaxPosition()
 
-	return min.Y - max.Y
+	return max.Y - min.Y
+	// return min.Y - max.Y
 }
 
 // Move loops through all the shapes in the space and moves them.
@@ -66,7 +70,7 @@ func (s *Space) MaxPosition() r.Vector2 {
 	)
 
 	for i := range *s {
-		tmp := (*s)[i].Position()
+		tmp := (*s)[i].MaxPosition()
 		if tmp.X > res.X || set.X == 0 {
 			set.X = 1
 			res.X = tmp.X

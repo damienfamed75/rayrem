@@ -20,8 +20,7 @@ type Game struct {
 	mode common.Mode
 
 	player *player.Player
-	world  *physics.Space
-	space  *physics.SpatialHashmap
+	solids *physics.SpatialHashmap
 
 	scenes map[common.Mode]common.Scene
 }
@@ -30,13 +29,11 @@ type Game struct {
 // Also is used to create all the scenes and assign them in the scenes map.
 func NewGame() *Game {
 	g := &Game{
-		world: physics.NewSpace(),
-		space: physics.NewSpatialHashmap(3),
-		// space: physics.NewSpatialHashmap(7),
+		solids: physics.NewSpatialHashmap(6),
 	}
 
 	// Create the player.
-	player, err := player.New(0, 0, g.world)
+	player, err := player.New(0, 0, g.solids)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -45,7 +42,7 @@ func NewGame() *Game {
 
 	// Setup all the scenes in the game.
 	g.scenes = map[common.Mode]common.Scene{
-		common.ModeTesting:  scene.NewTestingScene(g, g.player, g.world, g.space),
+		common.ModeTesting:  scene.NewTestingScene(g, g.player, g.solids),
 		common.ModeMainMenu: scene.NewMenu(g),
 	}
 

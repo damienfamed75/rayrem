@@ -21,17 +21,17 @@ type Player struct {
 	jumpHeight          float32
 	friction            float32
 
-	world *physics.Space
+	solids *physics.SpatialHashmap
 }
 
 // New creates a player at the position specified.
 // the world object is updated dynamically because the ground elements aren't
 // stored by value or locally at all.
-func New(x, y float32, world *physics.Space) (*Player, error) {
+func New(x, y float32, solids *physics.SpatialHashmap) (*Player, error) {
 	p := &Player{
 		friction:   common.Config.Player.Friction,
 		jumpHeight: common.Config.Player.JumpHeight,
-		world:      world,
+		solids:     solids,
 	}
 
 	ase, err := common.LoadSpritesheet(common.Config.Player.Spritesheet)
@@ -49,7 +49,7 @@ func New(x, y float32, world *physics.Space) (*Player, error) {
 
 	// Prepare the player's basic entity.
 	p.BasicEntity, err = physics.NewBasicEntity(
-		collision, world,
+		collision, solids,
 		r.NewVector2(common.Config.Player.MaxSpeed.X, common.Config.Player.MaxSpeed.Y),
 		ase,
 	)

@@ -1,45 +1,36 @@
 package physics
 
-import (
-	r "github.com/lachee/raylib-goplus/raylib"
-)
-
 type SpatialHashmap struct {
 	list             []Transformer
 	cellSize         int
 	lastTotalCleared int
-	getKeys          func(Transformer) [][2]int
-	hash             map[[2]int][]Transformer
-}
-
-type Transformer interface {
-	Position() r.Vector2
-	MaxPosition() r.Vector2
+	getKeys          func(Transformer) []point
+	hash             map[point][]Transformer
 }
 
 func NewSpatialHashmap(cellSize int) *SpatialHashmap {
 	s := &SpatialHashmap{
 		cellSize: cellSize,
 		getKeys:  makeKeys(cellSize),
-		hash:     make(map[[2]int][]Transformer),
+		hash:     make(map[point][]Transformer),
 	}
 
 	return s
 }
 
-func makeKeys(shift int) func(Transformer) [][2]int {
-	return func(t Transformer) [][2]int {
+func makeKeys(shift int) func(Transformer) []point {
+	return func(t Transformer) []point {
 		sx := int(t.Position().X) >> shift
 		sy := int(t.Position().Y) >> shift
 		ex := int(t.MaxPosition().X) >> shift
 		ey := int(t.MaxPosition().Y) >> shift
 
 		var x, y int
-		var keys [][2]int
+		var keys []point
 
 		for y = sy; y <= ey; y++ {
 			for x = sx; x <= ex; x++ {
-				keys = append(keys, [2]int{x, y})
+				keys = append(keys, point{x, y})
 			}
 		}
 
@@ -59,13 +50,13 @@ func (s *SpatialHashmap) Clear() {
 	s.list = []Transformer{}
 }
 
-func (s *SpatialHashmap) InsertMulti(tt ...Transformer) {
-	for i := range tt {
-		s.Insert(tt[i])
+func (s *SpatialHashmap) Insert(t ...Transformer) {
+	for i := range t {
+		s.insertSingle(t[i])
 	}
 }
 
-func (s *SpatialHashmap) Insert(t Transformer) {
+func (s *SpatialHashmap) insertSingle(t Transformer) {
 	keys := s.getKeys(t)
 	s.list = append(s.list, t)
 

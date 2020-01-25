@@ -16,6 +16,7 @@ type Shape interface {
 	Overlaps(rec r.Rectangle) bool
 	Position() r.Vector2
 	Center() r.Vector2
+	MaxPosition() r.Vector2
 	SetPosition(x, y float32)
 	Move(x, y float32)
 	Width() float32
