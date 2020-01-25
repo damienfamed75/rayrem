@@ -21,6 +21,7 @@ type Game struct {
 
 	player *player.Player
 	world  *physics.Space
+	space  *physics.SpatialHashmap
 
 	scenes map[common.Mode]common.Scene
 }
@@ -30,6 +31,8 @@ type Game struct {
 func NewGame() *Game {
 	g := &Game{
 		world: physics.NewSpace(),
+		space: physics.NewSpatialHashmap(3),
+		// space: physics.NewSpatialHashmap(7),
 	}
 
 	// Create the player.
@@ -42,7 +45,7 @@ func NewGame() *Game {
 
 	// Setup all the scenes in the game.
 	g.scenes = map[common.Mode]common.Scene{
-		common.ModeTesting:  scene.NewTestingScene(g, g.player, g.world),
+		common.ModeTesting:  scene.NewTestingScene(g, g.player, g.world, g.space),
 		common.ModeMainMenu: scene.NewMenu(g),
 	}
 
@@ -51,7 +54,7 @@ func NewGame() *Game {
 
 // SetScene changes the scene mode.
 func (g *Game) SetScene(mode common.Mode) {
-	g.world.Clear() // Clear the world of any remaining shapes.
+	// g.world.Clear() // Clear the world of any remaining shapes.
 	g.mode = mode
 }
 
