@@ -1,5 +1,8 @@
 package physics
 
+// SpatialHashmap is a data structure to tell what objects are close, if not
+// already colliding with each other.
+// More info: http://hhoppe.com/perfecthash.pdf
 type SpatialHashmap struct {
 	list             []Transformer
 	cellSize         int
@@ -8,6 +11,8 @@ type SpatialHashmap struct {
 	hash             map[point][]Transformer
 }
 
+// NewSpatialHashmap returns a hashmap with the sensitivity given.
+// The larger the cellSize, the more sensitive the hashmap is.
 func NewSpatialHashmap(cellSize int) *SpatialHashmap {
 	s := &SpatialHashmap{
 		cellSize: cellSize,
@@ -18,6 +23,8 @@ func NewSpatialHashmap(cellSize int) *SpatialHashmap {
 	return s
 }
 
+// makeKeys returns a function to store into memory, this is faster when
+// calculating the shift sensitivity to newly inserted objects.
 func makeKeys(shift int) func(Transformer) []point {
 	return func(t Transformer) []point {
 		sx := int(t.Position().X) >> shift
@@ -38,6 +45,7 @@ func makeKeys(shift int) func(Transformer) []point {
 	}
 }
 
+// Clear empties the spatial hashmap.
 func (s *SpatialHashmap) Clear() {
 	for key := range s.hash {
 		if len(s.hash[key]) == 0 {
@@ -50,6 +58,7 @@ func (s *SpatialHashmap) Clear() {
 	s.list = []Transformer{}
 }
 
+// Insert loops through the given transformers and inserts them into the map.
 func (s *SpatialHashmap) Insert(t ...Transformer) {
 	for i := range t {
 		s.insertSingle(t[i])
@@ -57,11 +66,15 @@ func (s *SpatialHashmap) Insert(t ...Transformer) {
 }
 
 func (s *SpatialHashmap) insertSingle(t Transformer) {
+	// Get the hash key of the object.
 	keys := s.getKeys(t)
 	s.list = append(s.list, t)
 
 	for i := 0; i < len(keys); i++ {
 		key := keys[i]
+
+		// If the key already exists, then append.
+		// If not then create the key location.
 		if s.hash[key] != nil {
 			s.hash[key] = append(s.hash[key], t)
 		} else {
@@ -70,6 +83,7 @@ func (s *SpatialHashmap) insertSingle(t Transformer) {
 	}
 }
 
+// NumBuckets returns the number of key locations (buckets.)
 func (s *SpatialHashmap) NumBuckets() int {
 	var count int
 	for key := range s.hash {
@@ -81,6 +95,7 @@ func (s *SpatialHashmap) NumBuckets() int {
 	return count
 }
 
+// Retrieve queries the spatial hashmap for nearby transforms to the given.
 func (s *SpatialHashmap) Retrieve(t Transformer) []Transformer {
 	var res []Transformer
 

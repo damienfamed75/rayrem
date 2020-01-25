@@ -140,68 +140,6 @@ func (b *Body) ResolveForces(dt float32) {
 			}
 		}
 	}
-
-	// filter the ground from the world.
-	// ground := b.world.FilterByTags(common.TagGround)
-
-	// for i := range *b.Space {
-	// 	collider := (*b.Space)[i].(*Rectangle).Rectangle
-	// 	tmpXRec := collider.Move(b.Velocity.X, 0)
-	// 	tmpYRec := collider.Move(0, b.Velocity.Y)
-
-	// 	original := b.Velocity
-
-	// 	for _, g := range *((*ground)[0].(*Space)) {
-	// 		switch t := g.(type) {
-	// 		case *Rectangle:
-	// 			// If the player hasn't collided with anything on the x-axis yet.
-	// 			if !colx {
-	// 				if g.Overlaps(tmpXRec) {
-	// 					overlap := t.Rectangle.GetOverlapRec(tmpXRec)
-	// 					colx = true
-
-	// 					if b.Velocity.X > 0 {
-	// 						b.Velocity.X -= overlap.Width
-	// 					} else {
-	// 						b.Velocity.X += overlap.Width
-	// 					}
-	// 				}
-	// 			}
-
-	// 			// If the player hasn't collided with anything on the y-axis yet.
-	// 			if !coly {
-	// 				if g.Overlaps(tmpYRec) {
-	// 					overlap := t.Rectangle.GetOverlapRec(tmpYRec)
-	// 					coly = true
-
-	// 					// If the player is moving downward and colliding.
-	// 					if b.Velocity.Y > 0 {
-	// 						b.onGround = true
-	// 					}
-
-	// 					if b.Velocity.Y > 0 {
-	// 						b.Velocity.Y -= overlap.Height
-	// 					} else {
-	// 						b.Velocity.Y += overlap.Height
-	// 					}
-	// 				}
-	// 			}
-	// 		// SlopePlatform is just three slopes.
-	// 		case *SlopePlatform:
-	// 			if g.Overlaps(tmpYRec) {
-	// 				// Ignore coly check, because slopes take higher priority.
-	// 				// Resolve all the slopes within the platform.
-	// 				coly = b.resolveSlope(t.landingZone1, tmpYRec, original)
-	// 				coly = b.resolveSlope(t.landingZone2, tmpYRec, original)
-	// 				coly = b.resolveSlope(t.slope, tmpYRec, original)
-	// 			}
-	// 		case *Slope:
-	// 			if g.Overlaps(tmpYRec) {
-	// 				coly = b.resolveSlope(t, tmpYRec, original)
-	// 			}
-	// 		}
-	// 	}
-	// }
 }
 
 func (b *Body) resolveSlope(t *Slope, tmpYRec r.Rectangle, original r.Vector2) (coly bool) {
