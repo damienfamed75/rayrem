@@ -17,45 +17,46 @@ var (
 type Testing struct {
 	sceneManager common.SceneManager
 	player       *player.Player
-	ground       *physics.Space
+	solids       *physics.SpatialHashmap
 	camera       *camera.FollowCamera
 
-	world *physics.Space
+	ground []physics.Transformer
 }
 
 // NewTestingScene returns a new scene. Not much to say here because this will
 // often change.
-func NewTestingScene(sceneManager common.SceneManager, player *player.Player, world *physics.Space) common.Scene {
+func NewTestingScene(sceneManager common.SceneManager, player *player.Player, solids *physics.SpatialHashmap) common.Scene {
 	t := &Testing{
 		sceneManager: sceneManager,
 		player:       player,
-		ground:       physics.NewSpace(),
-		world:        world,
+		solids:       solids,
 	}
 
 	// Set the player's position to its spawn position.
 	t.player.SetPosition(100, 100)
 
 	// Add ground elements.
-	t.ground.Add(
-		physics.NewRectangle(0, 200, 400, 200),
+	t.ground = []physics.Transformer{
+		physics.NewRectangle(0, 200, 50, 50),
+		physics.NewRectangle(50, 200, 50, 50),
+		physics.NewRectangle(100, 200, 50, 50),
+		physics.NewRectangle(150, 200, 50, 50),
+		physics.NewRectangle(200, 200, 50, 50),
+		physics.NewRectangle(250, 200, 50, 50),
+		physics.NewRectangle(300, 200, 50, 50),
+		physics.NewRectangle(350, 200, 50, 50),
 		physics.NewRectangle(400, 200, 200, 200),
 		physics.NewRectangle(200, 130, 50, 40),
 		physics.NewRectangle(375, 180, 100, 20),
 
 		physics.NewSlopePlatform(r.NewVector2(300, 200), r.NewVector2(350, 180), 25),
-	)
+	}
 
-	// Tag the ground elements as so.
-	t.ground.AddTags(common.TagGround)
+	// Insert the solids into the world.
+	t.solids.Insert(t.ground...)
 
 	// Create the scene camera.
 	t.camera = camera.NewFollow(t.player.Rigidbody.Space)
-
-	// Add the ground and player to the world space.
-	world.Add(
-		t.ground, t.player.Space,
-	)
 
 	return t
 }
@@ -71,7 +72,7 @@ func (t *Testing) Draw() {
 	r.BeginMode2D(t.camera.Camera2D)
 	r.ClearBackground(r.Black)
 
-	for _, g := range *t.ground {
+	for _, g := range t.ground {
 		switch t := g.(type) {
 		case *physics.Rectangle:
 			r.DrawRectangleLinesEx(t.Rectangle, 1, r.Orange)

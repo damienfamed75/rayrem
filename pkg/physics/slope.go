@@ -82,6 +82,11 @@ func (l *Slope) Position() r.Vector2 {
 	return l.p1
 }
 
+// MaxPosition is just filling the Shape interface and returns the second point.
+func (l *Slope) MaxPosition() r.Vector2 {
+	return l.p2
+}
+
 // SetPosition updates based on a difference.
 func (l *Slope) SetPosition(x, y float32) {
 	diff := r.NewVector2(l.Width(), l.Height())

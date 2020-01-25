@@ -21,19 +21,19 @@ type Body struct {
 	gravity  float32
 	onGround bool
 	maxSpeed r.Vector2
-	world    *Space
+	solids   *SpatialHashmap
 
 	*Space
 }
 
 // NewBody creates a default rigidbody and tags the Rigidbody space as a
 // physics body.
-func NewBody(collision, world *Space, maxSpeed r.Vector2) *Body {
+func NewBody(collision *Space, solids *SpatialHashmap, maxSpeed r.Vector2) *Body {
 	b := &Body{
 		Space:    collision,
 		maxSpeed: maxSpeed,
 		gravity:  common.Config.Game.Gravity,
-		world:    world,
+		solids:   solids,
 	}
 
 	b.AddTags(common.TagPhysicsBody)
@@ -77,22 +77,24 @@ func (b *Body) ResolveForces(dt float32) {
 	// ground objects at the same time.
 	var colx, coly bool
 
-	// filter the ground from the world.
-	ground := b.world.FilterByTags(common.TagGround)
-
 	for i := range *b.Space {
 		collider := (*b.Space)[i].(*Rectangle).Rectangle
 		tmpXRec := collider.Move(b.Velocity.X, 0)
 		tmpYRec := collider.Move(0, b.Velocity.Y)
-
 		original := b.Velocity
 
-		for _, g := range *((*ground)[0].(*Space)) {
-			switch t := g.(type) {
+		// Get all possible collision boxes.
+		// TODO check for uniqueness.
+		var possible []Transformer
+		possible = b.solids.Retrieve(tmpXRec)
+		possible = append(possible, b.solids.Retrieve(tmpYRec)...)
+
+		for _, p := range possible {
+			switch t := p.(type) {
 			case *Rectangle:
 				// If the player hasn't collided with anything on the x-axis yet.
 				if !colx {
-					if g.Overlaps(tmpXRec) {
+					if t.Overlaps(tmpXRec) {
 						overlap := t.Rectangle.GetOverlapRec(tmpXRec)
 						colx = true
 
@@ -106,7 +108,7 @@ func (b *Body) ResolveForces(dt float32) {
 
 				// If the player hasn't collided with anything on the y-axis yet.
 				if !coly {
-					if g.Overlaps(tmpYRec) {
+					if t.Overlaps(tmpYRec) {
 						overlap := t.Rectangle.GetOverlapRec(tmpYRec)
 						coly = true
 
@@ -124,7 +126,7 @@ func (b *Body) ResolveForces(dt float32) {
 				}
 			// SlopePlatform is just three slopes.
 			case *SlopePlatform:
-				if g.Overlaps(tmpYRec) {
+				if t.Overlaps(tmpYRec) {
 					// Ignore coly check, because slopes take higher priority.
 					// Resolve all the slopes within the platform.
 					coly = b.resolveSlope(t.landingZone1, tmpYRec, original)
@@ -132,7 +134,7 @@ func (b *Body) ResolveForces(dt float32) {
 					coly = b.resolveSlope(t.slope, tmpYRec, original)
 				}
 			case *Slope:
-				if g.Overlaps(tmpYRec) {
+				if t.Overlaps(tmpYRec) {
 					coly = b.resolveSlope(t, tmpYRec, original)
 				}
 			}
