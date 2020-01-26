@@ -83,6 +83,37 @@ func (s *SpatialHashmap) insertSingle(t Transformer) {
 	}
 }
 
+func (s *SpatialHashmap) Remove(t Transformer) {
+	keys := s.getKeys(t)
+	idxOfT := -1
+
+	for i := range s.list {
+		if s.list[i] == t {
+			idxOfT = i
+			break
+		}
+	}
+
+	for i := 0; i < len(keys); i++ {
+		key := keys[i]
+
+		if s.hash[key] != nil {
+			for j := range s.hash[key] {
+				if s.hash[key][j] == t {
+					s.hash[key] = append(s.hash[key][:j], s.hash[key][j+1:]...)
+					break
+				}
+			}
+		}
+	}
+
+	if idxOfT == -1 {
+		return
+	}
+
+	s.list = append(s.list[:idxOfT], s.list[idxOfT+1:]...)
+}
+
 // NumBuckets returns the number of key locations (buckets.)
 func (s *SpatialHashmap) NumBuckets() int {
 	var count int

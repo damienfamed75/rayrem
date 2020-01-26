@@ -3,6 +3,7 @@ package scene
 import (
 	"github.com/damienfamed75/rayrem/pkg/camera"
 	"github.com/damienfamed75/rayrem/pkg/common"
+	"github.com/damienfamed75/rayrem/pkg/object"
 	"github.com/damienfamed75/rayrem/pkg/physics"
 	"github.com/damienfamed75/rayrem/pkg/player"
 
@@ -35,6 +36,9 @@ func NewTestingScene(sceneManager common.SceneManager, player *player.Player, so
 	// Set the player's position to its spawn position.
 	t.player.SetPosition(100, 100)
 
+	// Somehow add it to a list of things to draw, but not in the ground.
+	object.NewDoor(225, 170, 7, 30, solids, false)
+
 	// Add ground elements.
 	t.ground = []physics.Transformer{
 		physics.NewRectangle(0, 200, 50, 50),
@@ -46,7 +50,11 @@ func NewTestingScene(sceneManager common.SceneManager, player *player.Player, so
 		physics.NewRectangle(300, 200, 50, 50),
 		physics.NewRectangle(350, 200, 50, 50),
 		physics.NewRectangle(400, 200, 200, 200),
+
+		// Floating platforms.
 		physics.NewRectangle(200, 130, 50, 40),
+		physics.NewPlatform(168, 160, 32, 10),
+
 		physics.NewRectangle(375, 180, 100, 20),
 
 		physics.NewSlopePlatform(r.NewVector2(300, 200), r.NewVector2(350, 180), 25),
@@ -74,10 +82,25 @@ func (t *Testing) Draw() {
 
 	for _, g := range t.ground {
 		switch t := g.(type) {
-		case *physics.Rectangle:
-			r.DrawRectangleLinesEx(t.Rectangle, 1, r.Orange)
+		case *physics.Space:
+			for _, obj := range *t {
+				r.DrawRectangleLinesEx(
+					r.NewRectangle(
+						obj.Position().X, obj.Position().Y,
+						obj.Width(), obj.Height(),
+					),
+					1, r.SkyBlue,
+				)
+			}
 		case interface{ Draw(float32, r.Color) }:
 			t.Draw(1.0, r.Green)
+		case *physics.Rectangle:
+			r.DrawRectangleLinesEx(t.Rectangle, 1, r.Orange)
+		case physics.Transformer:
+			r.DrawRectangleLinesEx(r.NewRectangle(
+				t.Position().X, t.Position().Y,
+				t.MaxPosition().X-t.Position().X, t.MaxPosition().Y-t.Position().Y,
+			), 1, r.Gold)
 		}
 	}
 
