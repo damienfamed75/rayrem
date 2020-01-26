@@ -41,6 +41,7 @@ func NewTestingScene(sceneManager common.SceneManager, player *player.Player, so
 
 	// Add ground elements.
 	t.ground = []physics.Transformer{
+		// Ground elements.
 		physics.NewRectangle(0, 200, 50, 50),
 		physics.NewRectangle(50, 200, 50, 50),
 		physics.NewRectangle(100, 200, 50, 50),
@@ -57,6 +58,7 @@ func NewTestingScene(sceneManager common.SceneManager, player *player.Player, so
 
 		physics.NewRectangle(375, 180, 100, 20),
 
+		// Slope platform.
 		physics.NewSlopePlatform(r.NewVector2(300, 200), r.NewVector2(350, 180), 25),
 	}
 
