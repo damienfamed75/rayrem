@@ -19,7 +19,7 @@ func (p *Player) TakeDamage() {}
 // Update updates the default basic entity and checks for movement and sends it
 // to the Rigidbody.
 func (p *Player) Update(dt float32) {
-	p.BasicEntity.Update(dt)
+	p.Actor.Update(dt)
 
 	if p.doubleJumpPerformed {
 		p.doubleJumpPerformed = !p.Rigidbody.OnGround()

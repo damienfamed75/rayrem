@@ -116,6 +116,7 @@ github.com/kr/text v0.1.0/go.mod h1:4Jbv+DJW3UT/LiOwJeYQe1efqtUx/iVham/4vfdArNI=
 github.com/lachee/raylib-goplus v0.0.0-20200106135705-aaff89088b9f h1:j/pu50rye0wkJp6mRnlxLq5GC9BATC6CblR50CkBOBo=
 github.com/lachee/raylib-goplus v0.0.0-20200106135705-aaff89088b9f/go.mod h1:dBwvFApqhdnnQuWzvHZnvWph/zlTAHC3nd/Hy6yBE8U=
 github.com/lachee/raylib-goplus v0.0.0-20200121030349-1c590181d3f6 h1:uhnB2Xtd5rNzQuHQGP+3CWMobHMjUfQRIeOMkHTTYvY=
+github.com/lachee/raylib-goplus v0.0.0-20200127004607-0ab9540a7320 h1:9Ob2OsBKzS7odiu3b03HH4zvDobqkMDEIrP0+sW7wh0=
 github.com/magiconair/properties v1.8.0/go.mod h1:PppfXfuXeibc/6YijjN8zIbojt8czPbwD3XqdrwzmxQ=
 github.com/magiconair/properties v1.8.1 h1:ZC2Vc7/ZFkGmsVC9KvOjumD+G5lXy2RtTKyzRKO2BQ4=
 github.com/magiconair/properties v1.8.1/go.mod h1:PppfXfuXeibc/6YijjN8zIbojt8czPbwD3XqdrwzmxQ=

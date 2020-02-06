@@ -11,7 +11,7 @@ import (
 // Draw is used to debug the game.
 // This function is only used when the game is ran in debug mode.
 func (p *Player) Draw() {
-	p.BasicEntity.Draw()
+	p.Actor.Draw()
 
 	r.DrawRectangleLines(
 		int(p.Position().X), int(p.Position().Y),

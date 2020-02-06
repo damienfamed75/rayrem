@@ -1,6 +1,7 @@
 {
 	"game": {
-		"gravity": 25
+		"gravity": 25,
+		"entityScale": 1.0
 	},
 	"player": {
 		"spritesheet": "player.json",

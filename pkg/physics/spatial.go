@@ -1,5 +1,9 @@
 package physics
 
+import (
+	"fmt"
+)
+
 // SpatialHashmap is a data structure to tell what objects are close, if not
 // already colliding with each other.
 // More info: http://hhoppe.com/perfecthash.pdf
@@ -9,6 +13,11 @@ type SpatialHashmap struct {
 	lastTotalCleared int
 	getKeys          func(Transformer) []point
 	hash             map[point][]Transformer
+}
+
+// SpatialAdder is a custom adder to the spatial hashmap.
+type SpatialAdder interface {
+	Add(w *SpatialHashmap) // custom add function
 }
 
 // NewSpatialHashmap returns a hashmap with the sensitivity given.
@@ -56,6 +65,22 @@ func (s *SpatialHashmap) Clear() {
 	}
 
 	s.list = []Transformer{}
+}
+
+// InsertI allows from interfaces to be placed in.
+func (s *SpatialHashmap) InsertI(objects ...interface{}) error {
+	for i := range objects {
+		switch t := objects[i].(type) {
+		case Transformer:
+			s.insertSingle(t)
+		case SpatialAdder:
+			t.Add(s)
+		default:
+			return fmt.Errorf("invalid insert: %v", t)
+		}
+	}
+
+	return nil
 }
 
 // Insert loops through the given transformers and inserts them into the map.

@@ -21,7 +21,8 @@ type Testing struct {
 	solids       *physics.SpatialHashmap
 	camera       *camera.FollowCamera
 
-	ground []physics.Transformer
+	// ground []physics.Transformer
+	ground []interface{}
 }
 
 // NewTestingScene returns a new scene. Not much to say here because this will
@@ -36,11 +37,15 @@ func NewTestingScene(sceneManager common.SceneManager, player *player.Player, so
 	// Set the player's position to its spawn position.
 	t.player.SetPosition(100, 100)
 
-	// Somehow add it to a list of things to draw, but not in the ground.
-	object.NewDoor(225, 170, 7, 30, solids, false)
+	// open, err := object.NewOpenable(
+	// 	r.NewRectangle(225, 170, 96, 32), false, "testing-door.json",
+	// )
+	// if err != nil {
+	// 	panic(err)
+	// }
 
 	// Add ground elements.
-	t.ground = []physics.Transformer{
+	t.ground = []interface{}{
 		// Ground elements.
 		physics.NewRectangle(0, 200, 50, 50),
 		physics.NewRectangle(50, 200, 50, 50),
@@ -53,17 +58,31 @@ func NewTestingScene(sceneManager common.SceneManager, player *player.Player, so
 		physics.NewRectangle(400, 200, 200, 200),
 
 		// Floating platforms.
-		physics.NewRectangle(200, 130, 50, 40),
-		physics.NewPlatform(168, 160, 32, 10),
+		physics.NewRectangle(96, 130, 40, 40),  // Left side
+		physics.NewRectangle(200, 130, 50, 40), // Right side
+		physics.NewPlatform(168, 160, 32, 10),  // floating platform.
 
 		physics.NewRectangle(375, 180, 100, 20),
 
 		// Slope platform.
 		physics.NewSlopePlatform(r.NewVector2(300, 200), r.NewVector2(350, 180), 25),
+
+		// open,
+		object.NewDoor(
+			r.NewRectangle(225, 170, 7, 30),
+			r.NewRectangle(218, 170, 21, 30),
+			false,
+		),
+		// hatch
+		object.NewDoor(
+			r.NewRectangle(136, 160, 32, 10),
+			r.NewRectangle(136, 150, 32, 30),
+			false,
+		),
 	}
 
 	// Insert the solids into the world.
-	t.solids.Insert(t.ground...)
+	t.solids.InsertI(t.ground...)
 
 	// Create the scene camera.
 	t.camera = camera.NewFollow(t.player.Rigidbody.Space)
@@ -103,6 +122,8 @@ func (t *Testing) Draw() {
 				t.Position().X, t.Position().Y,
 				t.MaxPosition().X-t.Position().X, t.MaxPosition().Y-t.Position().Y,
 			), 1, r.Gold)
+		case interface{ Draw() }:
+			t.Draw()
 		}
 	}
 

@@ -68,21 +68,6 @@ func (b *Body) Update(dt float32) {
 	b.Move(b.Velocity.X, b.Velocity.Y)
 }
 
-type colCheck [2]bool
-
-func (c *colCheck) X() bool {
-	return c[0]
-}
-func (c *colCheck) Y() bool {
-	return c[1]
-}
-func (c *colCheck) SetX(val bool) {
-	c[0] = val
-}
-func (c *colCheck) SetY(val bool) {
-	c[1] = val
-}
-
 // ResolveForces loops through the collision shapes and checks if they are
 // currently colliding with anything with the given velocity. If so then
 // the velocity is manipulated so that the potential collision will never happen.

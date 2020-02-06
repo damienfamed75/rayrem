@@ -22,7 +22,8 @@ var (
 
 type configuration struct {
 	Game struct {
-		Gravity float32 `json:"gravity"`
+		Gravity     float32 `json:"gravity"`
+		EntityScale float32 `json:"entityScale"`
 	} `json:"game"`
 	Player struct {
 		Spritesheet string  `json:"spritesheet"`

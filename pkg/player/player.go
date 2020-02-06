@@ -15,7 +15,7 @@ var (
 
 // Player is an entity that the user can control in the game.
 type Player struct {
-	*physics.BasicEntity
+	*physics.Actor
 
 	doubleJumpPerformed bool
 	jumpHeight          float32
@@ -47,8 +47,8 @@ func New(x, y float32, solids *physics.SpatialHashmap) (*Player, error) {
 		physics.NewRectangle(x, y, float32(ase.FrameBoundaries().Width), float32(ase.FrameBoundaries().Height)),
 	)
 
-	// Prepare the player's basic entity.
-	p.BasicEntity, err = physics.NewBasicEntity(
+	// Prepare the player's actor and basic entity.
+	p.Actor, err = physics.NewActor(
 		collision, solids,
 		r.NewVector2(common.Config.Player.MaxSpeed.X, common.Config.Player.MaxSpeed.Y),
 		ase,

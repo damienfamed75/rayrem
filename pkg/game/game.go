@@ -33,6 +33,7 @@ func NewGame() *Game {
 	}
 
 	// Create the player.
+	// TODO zones only activate on players.
 	player, err := player.New(0, 0, g.solids)
 	if err != nil {
 		log.Fatal(err)
