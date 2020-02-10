@@ -57,10 +57,10 @@ func (sp *SlopePlatform) Slope() *Slope {
 }
 
 // Draw is used for debugging when needing to draw the whole platform.
-func (sp *SlopePlatform) Draw(thickness float32, col r.Color) {
+func (sp *SlopePlatform) Draw() {
 	// Draw each landing zone.
-	r.DrawLineEx(sp.landingZone1.p1, sp.landingZone1.p2, thickness, col)
-	r.DrawLineEx(sp.landingZone2.p1, sp.landingZone2.p2, thickness, col)
+	r.DrawLineEx(sp.landingZone1.p1, sp.landingZone1.p2, 1, r.Green)
+	r.DrawLineEx(sp.landingZone2.p1, sp.landingZone2.p2, 1, r.Green)
 	// Draw the slope using its own draw function. (which will draw a triangle.)
-	sp.slope.Draw(thickness, col)
+	sp.slope.Draw()
 }

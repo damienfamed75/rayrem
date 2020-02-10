@@ -4,6 +4,11 @@ package physics
 // indexes 0-X, 1-Y are by default false.
 type colCheck [2]bool
 
+const (
+	colXIdx = iota
+	colYIdx
+)
+
 func (c *colCheck) X() bool {
 	return c[0]
 }

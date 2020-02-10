@@ -1,8 +1,6 @@
 package physics
 
 import (
-	"sort"
-
 	"github.com/damienfamed75/rayrem/pkg/common"
 
 	r "github.com/lachee/raylib-goplus/raylib"
@@ -10,13 +8,17 @@ import (
 
 var (
 	_ Shape = &Body{}
+
+	_ Moveable = &Body{}
+
+	_ Entity = &Body{}
 )
 
 // Body returns a physics rigidbody that reads ground as elements
 // that are tagged as common.TagGround and gravity is defaulted to what is in
 // the settings.
 type Body struct {
-	Velocity r.Vector2
+	velocity r.Vector2
 
 	gravity  float32
 	onGround bool
@@ -41,6 +43,19 @@ func NewBody(collision *Space, solids *SpatialHashmap, maxSpeed r.Vector2) *Body
 	return b
 }
 
+func (b *Body) Velocity() r.Vector2 {
+	return b.velocity
+}
+
+func (b *Body) SetVelocity(x, y float32) {
+	b.velocity.X = x
+	b.velocity.Y = y
+}
+
+func (b *Body) AddVelocity(x, y float32) {
+	b.velocity = b.velocity.Add(r.NewVector2(x, y))
+}
+
 // SetGravity overrides the default gravity.
 func (b *Body) SetGravity(g float32) {
 	b.gravity = g
@@ -55,17 +70,17 @@ func (b *Body) OnGround() bool {
 // Update checks for collisions in the world against the colliders in the
 // rigidbody space and adds gravity.
 func (b *Body) Update(dt float32) {
-	b.Velocity.Y += b.gravity * dt
+	b.velocity.Y += b.gravity * dt
 
 	b.maxVelocityCheck()
 
-	if b.Velocity.Y < -(b.gravity * dt) {
+	if b.velocity.Y < -(b.gravity * dt) {
 		b.onGround = false
 	}
 
 	b.ResolveForces(dt)
 
-	b.Move(b.Velocity.X, b.Velocity.Y)
+	b.Move(b.velocity.X, b.velocity.Y)
 }
 
 // ResolveForces loops through the collision shapes and checks if they are
@@ -80,59 +95,46 @@ func (b *Body) ResolveForces(dt float32) {
 
 	for i := range *b.Space {
 		collider := (*b.Space)[i].(*Rectangle).Rectangle
-		tmpXRec := collider.Move(b.Velocity.X, 0)
-		tmpYRec := collider.Move(0, b.Velocity.Y)
-		original := b.Velocity
+		tmpXRec := collider.Move(b.velocity.X, 0)
+		tmpYRec := collider.Move(0, b.velocity.Y)
+		original := b.velocity
 
 		// Get all possible collision boxes.
-		// TODO check for uniqueness.
-		var possible []Transformer
-		possible = b.solids.Retrieve(tmpXRec)
-		possible = append(possible, b.solids.Retrieve(tmpYRec)...)
+		possible := b.solids.Retrieve(collider.Move(b.velocity.X, b.velocity.Y))
 
 		b.resolveShapes(col, original, collider, tmpXRec, tmpYRec, possible...)
 	}
 }
 
-func (b *Body) resolveShapes(col colCheck, original r.Vector2, collider, tmpXRec, tmpYRec r.Rectangle, possible ...Transformer) colCheck {
+func (b *Body) resolveShapes(col colCheck, original r.Vector2, collider, tmpXRec, tmpYRec r.Rectangle, possible ...interface{}) colCheck {
 	for _, p := range possible {
+		// Skip from colliding against itself.
+		if ss, ok := p.(Entity); ok {
+			if ss.ID() == b.ID() {
+				continue
+			}
+		}
+
 		switch t := p.(type) {
+		case *Actor:
+			b.resolveSpace(
+				t.Space, func(tt ...interface{}) {
+					col = b.resolveShapes(col, original, collider, tmpXRec, tmpYRec, tt...)
+				},
+			)
 		case *Space:
-			var tt []Transformer
-			for i := range *t {
-				tt = append(tt, (*t)[i])
-			}
-
-			col = b.resolveShapes(col, original, collider, tmpXRec, tmpYRec, tt...)
+			b.resolveSpace(
+				t, func(tt ...interface{}) {
+					col = b.resolveShapes(col, original, collider, tmpXRec, tmpYRec, tt...)
+				},
+			)
 		case *Rectangle:
-			// If the player hasn't collided with anything on the x-axis yet.
-			if !col.X() && t.Overlaps(tmpXRec) {
-				overlap := t.Rectangle.GetOverlapRec(tmpXRec)
-				col.SetX(true)
-
-				if b.Velocity.X > 0 {
-					b.Velocity.X -= overlap.Width
-				} else {
-					b.Velocity.X += overlap.Width
-				}
-			}
-
-			// If the player hasn't collided with anything on the y-axis yet.
-			if !col.Y() && t.Overlaps(tmpYRec) {
-				overlap := t.Rectangle.GetOverlapRec(tmpYRec)
-				col.SetY(true)
-
-				// If the player is moving downward and colliding.
-				if b.Velocity.Y > 0 {
-					b.onGround = true
-				}
-
-				if b.Velocity.Y > 0 {
-					b.Velocity.Y -= overlap.Height
-				} else {
-					b.Velocity.Y += overlap.Height
-				}
-			}
+			col.SetX(b.resolveRectangle(
+				t, tmpXRec, col.X(), b.velocity.X, r.NewVector2(1, 0),
+			))
+			col.SetY(b.resolveRectangle(
+				t, tmpYRec, col.Y(), b.velocity.Y, r.NewVector2(0, 1),
+			))
 		// SlopePlatform is just three slopes.
 		case *SlopePlatform:
 			if t.Overlaps(tmpYRec) {
@@ -147,7 +149,7 @@ func (b *Body) resolveShapes(col colCheck, original r.Vector2, collider, tmpXRec
 				col.SetY(b.resolveSlope(t, tmpYRec, original))
 			}
 		case *Platform:
-			if !col.Y() && b.Velocity.Y > 0 && t.Overlaps(tmpYRec) {
+			if !col.Y() && b.velocity.Y > 0 && t.Overlaps(tmpYRec) {
 				overlap := t.Rectangle.GetOverlapRec(tmpYRec)
 
 				// If the overlapped rectangle is more than halfway down
@@ -155,7 +157,7 @@ func (b *Body) resolveShapes(col colCheck, original r.Vector2, collider, tmpXRec
 				if overlap.Y > tmpYRec.Center().Y {
 					col.SetY(true)
 					b.onGround = true
-					b.Velocity.Y -= overlap.Height
+					b.velocity.Y -= overlap.Height
 				}
 			}
 		case *Zone:
@@ -169,61 +171,19 @@ func (b *Body) resolveShapes(col colCheck, original r.Vector2, collider, tmpXRec
 	return col
 }
 
-func (b *Body) resolveSlope(t *Slope, tmpYRec r.Rectangle, original r.Vector2) (coly bool) {
-	var intersections []IntersectionPoint
-
-	side := NewSlope(
-		r.NewVector2(tmpYRec.X, tmpYRec.Y),
-		r.NewVector2(tmpYRec.X, tmpYRec.MaxPosition().Y),
-	)
-	intersections = append(intersections, t.GetIntersectionPoints(side)...)
-
-	side.p1 = r.NewVector2(tmpYRec.MaxPosition().X, tmpYRec.MaxPosition().Y)
-	intersections = append(intersections, t.GetIntersectionPoints(side)...)
-
-	side.p2 = r.NewVector2(tmpYRec.MaxPosition().X, tmpYRec.Y)
-	intersections = append(intersections, t.GetIntersectionPoints(side)...)
-
-	// intersections := t.GetIntersectionPoints(NewRectangle(tmpYRec.X, tmpYRec.Y, tmpYRec.Width, tmpYRec.Height))
-	if len(intersections) == 0 {
-		return
-	}
-
-	// Sort the intersections based on Y.
-	sort.Slice(intersections, func(i, j int) bool {
-		return intersections[i].Y > intersections[j].Y
-	})
-
-	tmpL := NewSlope(
-		r.NewVector2(intersections[0].X, intersections[0].Y),
-		r.NewVector2(intersections[len(intersections)-1].X, intersections[len(intersections)-1].Y),
-	)
-
-	dy := tmpL.p2.Y - tmpL.p1.Y
-	colBox := r.NewRectangle(tmpYRec.X, intersections[0].Y+(dy/2), tmpYRec.Width, tmpYRec.Height/2)
-	overlap := colBox.GetOverlapRec(tmpYRec)
-
-	b.onGround = true
-	coly = true
-
-	b.Velocity.Y = original.Y - overlap.Height
-
-	return
-}
-
 func (b *Body) maxVelocityCheck() {
 	// Cap player movement speed.
-	if b.Velocity.X > b.maxSpeed.X {
-		b.Velocity.X = b.maxSpeed.X
+	if b.velocity.X > b.maxSpeed.X {
+		b.velocity.X = b.maxSpeed.X
 	}
-	if b.Velocity.X < -b.maxSpeed.X {
-		b.Velocity.X = -b.maxSpeed.X
+	if b.velocity.X < -b.maxSpeed.X {
+		b.velocity.X = -b.maxSpeed.X
 	}
 
-	if b.Velocity.Y > b.maxSpeed.Y {
-		b.Velocity.Y = b.maxSpeed.Y
+	if b.velocity.Y > b.maxSpeed.Y {
+		b.velocity.Y = b.maxSpeed.Y
 	}
-	if b.Velocity.Y < -b.maxSpeed.Y {
-		b.Velocity.Y = -b.maxSpeed.Y
+	if b.velocity.Y < -b.maxSpeed.Y {
+		b.velocity.Y = -b.maxSpeed.Y
 	}
 }

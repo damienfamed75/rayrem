@@ -10,7 +10,8 @@ import (
 )
 
 var (
-	_ common.Entity = &Player{}
+	_ common.Entity    = &Player{}
+	_ physics.Moveable = &Player{}
 )
 
 // Player is an entity that the user can control in the game.

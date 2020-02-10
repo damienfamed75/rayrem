@@ -8,11 +8,15 @@ import (
 // already colliding with each other.
 // More info: http://hhoppe.com/perfecthash.pdf
 type SpatialHashmap struct {
-	list             []Transformer
+	list     []interface{}
+	moveList []interface{}
+
 	cellSize         int
 	lastTotalCleared int
 	getKeys          func(Transformer) []point
-	hash             map[point][]Transformer
+
+	hash map[point][]interface{}
+	// hash map[point][]Transformer
 }
 
 // SpatialAdder is a custom adder to the spatial hashmap.
@@ -26,7 +30,7 @@ func NewSpatialHashmap(cellSize int) *SpatialHashmap {
 	s := &SpatialHashmap{
 		cellSize: cellSize,
 		getKeys:  makeKeys(cellSize),
-		hash:     make(map[point][]Transformer),
+		hash:     make(map[point][]interface{}),
 	}
 
 	return s
@@ -60,21 +64,23 @@ func (s *SpatialHashmap) Clear() {
 		if len(s.hash[key]) == 0 {
 			delete(s.hash, key)
 		} else {
-			s.hash[key] = []Transformer{}
+			s.hash[key] = []interface{}{}
 		}
 	}
 
-	s.list = []Transformer{}
+	s.list = []interface{}{}
 }
 
 // InsertI allows from interfaces to be placed in.
 func (s *SpatialHashmap) InsertI(objects ...interface{}) error {
 	for i := range objects {
 		switch t := objects[i].(type) {
-		case Transformer:
-			s.insertSingle(t)
 		case SpatialAdder:
 			t.Add(s)
+		case Moveable:
+			s.InsertMoveables(t)
+		case Transformer:
+			s.insertSingle(t)
 		default:
 			return fmt.Errorf("invalid insert: %v", t)
 		}
@@ -98,6 +104,13 @@ func (s *SpatialHashmap) InsertSA(sa ...SpatialAdder) {
 	}
 }
 
+func (s *SpatialHashmap) InsertMoveables(mm ...Moveable) {
+	for i := range mm {
+		s.list = append(s.list, mm[i])
+		s.moveList = append(s.moveList, mm[i])
+	}
+}
+
 func (s *SpatialHashmap) insertSingle(t Transformer) {
 	// Get the hash key of the object.
 	keys := s.getKeys(t)
@@ -111,7 +124,7 @@ func (s *SpatialHashmap) insertSingle(t Transformer) {
 		if s.hash[key] != nil {
 			s.hash[key] = append(s.hash[key], t)
 		} else {
-			s.hash[key] = []Transformer{t}
+			s.hash[key] = []interface{}{t}
 		}
 	}
 }
@@ -160,8 +173,10 @@ func (s *SpatialHashmap) NumBuckets() int {
 }
 
 // Retrieve queries the spatial hashmap for nearby transforms to the given.
-func (s *SpatialHashmap) Retrieve(t Transformer) []Transformer {
-	var res []Transformer
+func (s *SpatialHashmap) Retrieve(t Transformer) []interface{} {
+	// func (s *SpatialHashmap) Retrieve(t Transformer) []Transformer {
+	var res []interface{}
+	res = append(res, s.moveList...)
 
 	if t == nil {
 		return s.list

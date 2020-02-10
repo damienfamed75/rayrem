@@ -1,6 +1,7 @@
 package physics
 
 import (
+	"github.com/damienfamed75/rayrem/pkg/common"
 	r "github.com/lachee/raylib-goplus/raylib"
 )
 
@@ -14,6 +15,14 @@ type Space []Shape
 // NewSpace returns a reference to an empty slice of shapes.
 func NewSpace() *Space {
 	return &Space{}
+}
+
+func (s *Space) ID() uint64 {
+	if len(*s) > 0 {
+		return (*s)[0].ID()
+	}
+
+	return 0
 }
 
 // Clear empties the slice.
@@ -146,7 +155,7 @@ func (s *Space) Remove(rec ...Shape) {
 }
 
 // AddTags adds tags to all shapes.
-func (s *Space) AddTags(tags ...string) {
+func (s *Space) AddTags(tags ...common.Tag) {
 	for i := range *s {
 		for _, t := range tags {
 			if !(*s)[i].HasTags(t) {
@@ -164,7 +173,7 @@ func (s *Space) ClearTags() {
 }
 
 // Tags gets all tags from its shapes and returns a big list of them.
-func (s *Space) Tags() []string {
+func (s *Space) Tags() []common.Tag {
 	var tmp = &Rectangle{}
 	for i := range *s {
 		tt := (*s)[i].Tags()
@@ -179,7 +188,7 @@ func (s *Space) Tags() []string {
 }
 
 // HasTags sees if any shapes have all those tags.
-func (s *Space) HasTags(tags ...string) bool {
+func (s *Space) HasTags(tags ...common.Tag) bool {
 	for i := range *s {
 		for _, t := range tags {
 			if (*s)[i].HasTags(t) {
@@ -191,7 +200,7 @@ func (s *Space) HasTags(tags ...string) bool {
 }
 
 // RemoveTags removes tags provided from the shapes if they exist.
-func (s *Space) RemoveTags(tags ...string) {
+func (s *Space) RemoveTags(tags ...common.Tag) {
 	for i := range *s {
 		(*s)[i].RemoveTags(tags...)
 	}
@@ -211,7 +220,7 @@ func (s *Space) Filter(filter func(Shape) bool) *Space {
 }
 
 // FilterByTags filters out any shapes that don't have all the tags provided.
-func (s *Space) FilterByTags(tags ...string) *Space {
+func (s *Space) FilterByTags(tags ...common.Tag) *Space {
 	return s.Filter(func(r Shape) bool {
 		if r.HasTags(tags...) {
 			return true
@@ -221,7 +230,7 @@ func (s *Space) FilterByTags(tags ...string) *Space {
 }
 
 // FilterOutByTags filters out any shapes that have all the tags provided.
-func (s *Space) FilterOutByTags(tags ...string) *Space {
+func (s *Space) FilterOutByTags(tags ...common.Tag) *Space {
 	return s.Filter(func(r Shape) bool {
 		if r.HasTags(tags...) {
 			return false

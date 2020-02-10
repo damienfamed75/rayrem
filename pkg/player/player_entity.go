@@ -25,32 +25,32 @@ func (p *Player) Update(dt float32) {
 		p.doubleJumpPerformed = !p.Rigidbody.OnGround()
 	}
 
-	if p.Rigidbody.Velocity.X > p.friction {
-		p.Rigidbody.Velocity.X -= p.friction
+	if p.Velocity().X > p.friction {
+		p.AddVelocity(-p.friction, 0)
 		p.Facing = common.Right
 		p.Ase.Play("run")
-	} else if p.Rigidbody.Velocity.X < -p.friction {
-		p.Rigidbody.Velocity.X += p.friction
+	} else if p.Velocity().X < -p.friction {
+		p.AddVelocity(+p.friction, 0)
 		p.Facing = common.Left
 		p.Ase.Play("run")
 	} else {
-		p.Rigidbody.Velocity.X = 0
+		p.SetVelocity(0, p.Velocity().Y)
 		p.Ase.Play("idle")
 	}
 
 	if r.IsKeyDown(r.KeyRight) {
-		p.Rigidbody.Velocity.X++
+		p.AddVelocity(1, 0)
 	}
 
 	if r.IsKeyDown(r.KeyLeft) {
-		p.Rigidbody.Velocity.X--
+		p.AddVelocity(-1, 0)
 	}
 
 	if r.IsKeyPressed(r.KeyUp) {
 		if p.Rigidbody.OnGround() {
-			p.Rigidbody.Velocity.Y = -p.jumpHeight
+			p.SetVelocity(p.Velocity().X, -p.jumpHeight)
 		} else if !p.Rigidbody.OnGround() && !p.doubleJumpPerformed {
-			p.Rigidbody.Velocity.Y = -p.jumpHeight
+			p.SetVelocity(p.Velocity().X, -p.jumpHeight)
 			p.doubleJumpPerformed = true
 		}
 	}

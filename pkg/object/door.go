@@ -79,23 +79,25 @@ func (d *Door) Add(w *physics.SpatialHashmap) {
 
 	// Setup a mailbox to listen for door messages.
 	d.interactable.mailbox.Listen(d.interactable.msgType, func(m msg.Message) {
-		if !d.Lock.locked {
-			if r.IsKeyPressed(r.KeyE) {
-				zm := m.(*physics.ZoneMessage)
-
-				d.openDir = common.Right
-				// if the overlapping rectangle's max X position is less than
-				// the center of the aoa zone then open the door left.
-				if zm.Overlap.MaxPosition().X < d.zone.Rectangle.Rectangle.Center().X {
-					d.openDir = common.Left
-				}
-
-				// Remove the door from the spatial hashmap.
-				w.Remove(d.zone)
-				w.Remove(d.collider)
-				// Set open to true.
-				d.open = true
+		if !d.Lock.locked && r.IsKeyPressed(r.KeyE) {
+			zm := m.(*physics.ZoneMessage)
+			// If the colliding zone isn't the player, then ignore this message.
+			if !zm.Entity.HasTags(common.TagPlayer) {
+				return
 			}
+
+			d.openDir = common.Right
+			// if the overlapping rectangle's max X position is less than
+			// the center of the aoa zone then open the door left.
+			if zm.Overlap.MaxPosition().X < d.zone.Rectangle.Rectangle.Center().X {
+				d.openDir = common.Left
+			}
+
+			// Remove the door from the spatial hashmap.
+			w.Remove(d.zone)
+			w.Remove(d.collider)
+			// Set open to true.
+			d.open = true
 		}
 	})
 }

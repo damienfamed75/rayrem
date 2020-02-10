@@ -16,7 +16,7 @@ type Rectangle struct {
 // NewRectangle creates a rectangle and basic object.
 func NewRectangle(x, y, w, h float32) *Rectangle {
 	return &Rectangle{
-		BasicShape: &BasicShape{},
+		BasicShape: NewBasicShape(),
 		Rectangle:  r.NewRectangle(x, y, w, h),
 	}
 }

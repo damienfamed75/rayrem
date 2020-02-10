@@ -7,3 +7,8 @@ type Transformer interface {
 	Position() r.Vector2
 	MaxPosition() r.Vector2
 }
+
+type Moveable interface {
+	Transformer
+	Velocity() r.Vector2
+}

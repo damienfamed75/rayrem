@@ -13,6 +13,12 @@ import (
 var (
 	// Actor fills the common.Entity.
 	_ common.Entity = &Actor{}
+
+	_ SpatialAdder = &Actor{}
+
+	_ Moveable = &Actor{}
+
+	_ Entity = &Actor{}
 )
 
 // Actor has fundamental parts of a moveable entity such as
@@ -42,9 +48,32 @@ func NewActor(collision *Space, solids *SpatialHashmap, maxSpeed r.Vector2, ase 
 	}
 
 	// Add the rigidbody to the basic entity space.
-	b.Space.Add(b.Rigidbody)
+	b.Space.Add(b.Rigidbody.Space)
 
 	return b, nil
+}
+
+func (b *Actor) ID() uint64 {
+	// Since we only really care about the collision space we only return the
+	// rigidbody's space ID to check on itself.
+	return b.Rigidbody.ID()
+}
+
+func (b *Actor) Add(w *SpatialHashmap) {
+	w.InsertMoveables(b)
+}
+
+func (b *Actor) Velocity() r.Vector2 {
+	return b.Rigidbody.velocity
+}
+
+func (b *Actor) SetVelocity(x, y float32) {
+	b.Rigidbody.velocity.X = x
+	b.Rigidbody.velocity.Y = y
+}
+
+func (b *Actor) AddVelocity(x, y float32) {
+	b.Rigidbody.velocity = b.Rigidbody.velocity.Add(r.NewVector2(x, y))
 }
 
 // TakeDamage doesn't do anything by default.
@@ -53,6 +82,11 @@ func (b *Actor) TakeDamage() {}
 // Position returns the position of the rigidbody's collision space.
 func (b *Actor) Position() r.Vector2 {
 	return b.Rigidbody.Position()
+}
+
+// MaxPosition returns the end position of the rigidbody's collision space.
+func (b *Actor) MaxPosition() r.Vector2 {
+	return b.Rigidbody.MaxPosition()
 }
 
 // Update is the barebones just update the spritesheet state and rigidbody.
