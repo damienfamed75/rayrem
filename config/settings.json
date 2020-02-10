@@ -15,5 +15,8 @@
 	"camera": {
 		"zoom": 4,
 		"lerp": 0.2
+	},
+	"objects": {
+		"keyPath": "key.json"
 	}
 }

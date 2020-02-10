@@ -4,4 +4,5 @@ package msg
 const (
 	Door = "door"
 	Open = "open"
+	Lock = "lock"
 )

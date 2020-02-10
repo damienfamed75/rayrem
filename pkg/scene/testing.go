@@ -21,7 +21,6 @@ type Testing struct {
 	solids       *physics.SpatialHashmap
 	camera       *camera.FollowCamera
 
-	// ground []physics.Transformer
 	ground []interface{}
 }
 
@@ -43,6 +42,11 @@ func NewTestingScene(sceneManager common.SceneManager, player *player.Player, so
 	// if err != nil {
 	// 	panic(err)
 	// }
+
+	key, err := object.NewKey(r.NewVector2(150, 100))
+	if err != nil {
+		panic(err)
+	}
 
 	// Add ground elements.
 	t.ground = []interface{}{
@@ -68,17 +72,22 @@ func NewTestingScene(sceneManager common.SceneManager, player *player.Player, so
 		physics.NewSlopePlatform(r.NewVector2(300, 200), r.NewVector2(350, 180), 25),
 
 		// open,
+		// ground door.
 		object.NewDoor(
-			r.NewRectangle(225, 170, 7, 30),
-			r.NewRectangle(218, 170, 21, 30),
-			false,
+			r.NewVector2(225, 170),
+			object.WithLock(key.Lock()),
 		),
+		// object.NewDoor(
+		// 	r.NewRectangle(225, 170, 7, 30),
+		// 	r.NewRectangle(218, 170, 21, 30),
+		// 	object.WithLock(key.Lock()),
+		// ),
 		// hatch
-		object.NewDoor(
-			r.NewRectangle(136, 160, 32, 10),
-			r.NewRectangle(136, 150, 32, 30),
-			false,
-		),
+		// object.NewDoor(
+		// 	r.NewRectangle(136, 160, 32, 10),
+		// 	r.NewRectangle(136, 150, 32, 30),
+		// ),
+		key,
 	}
 
 	// Insert the solids into the world.

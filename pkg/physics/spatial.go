@@ -90,6 +90,14 @@ func (s *SpatialHashmap) Insert(t ...Transformer) {
 	}
 }
 
+// InsertSA loops through the given SpatialAdders and inserts them into the map.
+func (s *SpatialHashmap) InsertSA(sa ...SpatialAdder) {
+	for i := range sa {
+		// Allow the spatial adder to add itself into the hashmap.
+		sa[i].Add(s)
+	}
+}
+
 func (s *SpatialHashmap) insertSingle(t Transformer) {
 	// Get the hash key of the object.
 	keys := s.getKeys(t)

@@ -38,6 +38,9 @@ type configuration struct {
 		Zoom float32 `json:"zoom"`
 		Lerp float32 `json:"lerp"`
 	} `json:"camera"`
+	Objects struct {
+		KeyPath string `json:"keyPath"`
+	} `json:"objects"`
 }
 
 // LoadConfig loads in the debug and public configuration files.
