@@ -11,73 +11,94 @@ import (
 )
 
 var (
-	// BasicEntity fills the common.Entity.
-	_ common.Entity = &BasicEntity{}
+	// Actor fills the common.Entity.
+	_ common.Entity = &Actor{}
+
+	_ SpatialAdder = &Actor{}
+
+	_ Moveable = &Actor{}
+
+	_ Entity = &Actor{}
 )
 
-// BasicEntity has fundamental parts of a moveable entity such as
+// Actor has fundamental parts of a moveable entity such as
 // a sprite, facing directions, changeable color, a rigidbody, and a space.
-type BasicEntity struct {
-	Ase      *aseprite.File
-	Sprite   r.Texture2D
-	Color    r.Color
-	Facing   common.Direction
-	Scale    float32
-	Rotation float32
+type Actor struct {
+	Facing common.Direction
 
 	Rigidbody *Body
+	Space     *Space
 
-	Space *Space
+	*common.BasicEntity
 }
 
-// NewBasicEntity returns a basic entity that loads in the sprite
+// NewActor returns a basic entity that loads in the sprite
 // based on the given spritesheet. Also creates and adds the rigidbody.
-func NewBasicEntity(collision *Space, solids *SpatialHashmap, maxSpeed r.Vector2, ase *aseprite.File) (*BasicEntity, error) {
-	b := &BasicEntity{
-		Ase:       ase,
-		Color:     r.White,
+func NewActor(collision *Space, solids *SpatialHashmap, maxSpeed r.Vector2, ase *aseprite.File) (*Actor, error) {
+	b := &Actor{
 		Facing:    common.Right,
-		Scale:     1.0,
 		Rigidbody: NewBody(collision, solids, maxSpeed),
 		Space:     NewSpace(),
 	}
 
-	// Load the spritesheet image from package.
-	sprite, err := common.LoadPNG(ase.Meta.Image)
+	var err error
+	b.BasicEntity, err = common.NewBasicEntity(ase)
 	if err != nil {
-		return nil, fmt.Errorf("loading spritesheet image: %w", err)
+		return nil, fmt.Errorf("basic entity: %w", err)
 	}
 
-	// Load the image into raylib using a Go image.Image.
-	img := r.LoadImageFromGo(sprite)
-
-	// Load a texture from a raylib image.
-	b.Sprite = r.LoadTextureFromImage(img)
-
 	// Add the rigidbody to the basic entity space.
-	b.Space.Add(b.Rigidbody)
+	b.Space.Add(b.Rigidbody.Space)
 
 	return b, nil
 }
 
+func (b *Actor) ID() uint64 {
+	// Since we only really care about the collision space we only return the
+	// rigidbody's space ID to check on itself.
+	return b.Rigidbody.ID()
+}
+
+func (b *Actor) Add(w *SpatialHashmap) {
+	w.InsertMoveables(b)
+}
+
+func (b *Actor) Velocity() r.Vector2 {
+	return b.Rigidbody.velocity
+}
+
+func (b *Actor) SetVelocity(x, y float32) {
+	b.Rigidbody.velocity.X = x
+	b.Rigidbody.velocity.Y = y
+}
+
+func (b *Actor) AddVelocity(x, y float32) {
+	b.Rigidbody.velocity = b.Rigidbody.velocity.Add(r.NewVector2(x, y))
+}
+
 // TakeDamage doesn't do anything by default.
-func (b *BasicEntity) TakeDamage() {}
+func (b *Actor) TakeDamage() {}
 
 // Position returns the position of the rigidbody's collision space.
-func (b *BasicEntity) Position() r.Vector2 {
+func (b *Actor) Position() r.Vector2 {
 	return b.Rigidbody.Position()
 }
 
+// MaxPosition returns the end position of the rigidbody's collision space.
+func (b *Actor) MaxPosition() r.Vector2 {
+	return b.Rigidbody.MaxPosition()
+}
+
 // Update is the barebones just update the spritesheet state and rigidbody.
-func (b *BasicEntity) Update(dt float32) {
+func (b *Actor) Update(dt float32) {
 	b.Ase.Update(dt)
 	b.Rigidbody.Update(dt)
 }
 
 // Draw is used by default if the parent struct doesn't overwrite it.
 // it just draws the sprite in the spritesheet, rotates, changes direction,
-// scales, and colors as according to the BasicEntity field values.
-func (b *BasicEntity) Draw() {
+// scales, and colors as according to the Actor field values.
+func (b *Actor) Draw() {
 	srcX, srcY := b.Ase.FrameBoundaries().X, b.Ase.FrameBoundaries().Y
 	w, h := b.Ase.FrameBoundaries().Width, b.Ase.FrameBoundaries().Height
 

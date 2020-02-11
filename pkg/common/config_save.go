@@ -16,14 +16,19 @@ import (
 // current game.config or if you're not using game.config then it'll overwrite
 // the game.json file instead.
 func SavePublicConfig() {
+	// if the game config is encrypted then save it encrypted.
 	if usingEncrypted {
 		tmp := make(map[string]interface{})
 		PublicConfig.Unmarshal(&tmp)
 
 		writeEncrypted(tmp)
 	} else {
+		// non encrypted save.
 		PublicConfig.WriteConfig()
 	}
+
+	// Update the controls structure.
+	loadControls()
 }
 
 func loadTemp(path string) ([]byte, error) {

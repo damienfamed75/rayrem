@@ -5,6 +5,8 @@ github.com/EngoEngine/ecs v1.0.3/go.mod h1:B/+b8S8xOPXaI05sFRBQ94nWHFxerBuSUPa4E
 github.com/EngoEngine/engo v1.0.4/go.mod h1:26pQhmZ5PHT2e6ErXINMvlfM4PUW7YPwH+wtMpMUme4=
 github.com/EngoEngine/gl v1.0.4/go.mod h1:dnyz++urxtBU2x5U5NzvOsVzDCDrwAOSsjXi6/9YH6o=
 github.com/EngoEngine/math v1.0.4/go.mod h1:d8SnfwiaImse0lB3JuR91B2CShZmMxaTWaWZ/ZxDxAU=
+github.com/Lachee/raylib-goplus v0.0.0-20200127004607-0ab9540a7320 h1:IIvdK04GK6gSotG+ILNLzFc6/i4FZNrB1z+0/TrZilc=
+github.com/Lachee/raylib-goplus v0.0.0-20200127004607-0ab9540a7320/go.mod h1:Xlg7toyG2MybbhjwHWRKbyGy+k6qn/ztN5/AYcqdl6Y=
 github.com/Noofbiz/glfwMojaveFix v0.0.1/go.mod h1:NTfOoelFiHp38iK4KTLXG5gOcgSqrwi6n24cgHSwZDc=
 github.com/Noofbiz/sdlMojaveFix v0.0.1/go.mod h1:ZvRLF4Dk75OnTtHfCMClqgwrX0u531XWaai0lNGzKWE=
 github.com/Noofbiz/tmx v0.2.0/go.mod h1:gL6mQUTp1Vi9pq/gmCgyotzJ35lOQF2C2NKJrQtltAE=
@@ -116,6 +118,7 @@ github.com/kr/text v0.1.0/go.mod h1:4Jbv+DJW3UT/LiOwJeYQe1efqtUx/iVham/4vfdArNI=
 github.com/lachee/raylib-goplus v0.0.0-20200106135705-aaff89088b9f h1:j/pu50rye0wkJp6mRnlxLq5GC9BATC6CblR50CkBOBo=
 github.com/lachee/raylib-goplus v0.0.0-20200106135705-aaff89088b9f/go.mod h1:dBwvFApqhdnnQuWzvHZnvWph/zlTAHC3nd/Hy6yBE8U=
 github.com/lachee/raylib-goplus v0.0.0-20200121030349-1c590181d3f6 h1:uhnB2Xtd5rNzQuHQGP+3CWMobHMjUfQRIeOMkHTTYvY=
+github.com/lachee/raylib-goplus v0.0.0-20200127004607-0ab9540a7320 h1:9Ob2OsBKzS7odiu3b03HH4zvDobqkMDEIrP0+sW7wh0=
 github.com/magiconair/properties v1.8.0/go.mod h1:PppfXfuXeibc/6YijjN8zIbojt8czPbwD3XqdrwzmxQ=
 github.com/magiconair/properties v1.8.1 h1:ZC2Vc7/ZFkGmsVC9KvOjumD+G5lXy2RtTKyzRKO2BQ4=
 github.com/magiconair/properties v1.8.1/go.mod h1:PppfXfuXeibc/6YijjN8zIbojt8czPbwD3XqdrwzmxQ=

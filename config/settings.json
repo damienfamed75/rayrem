@@ -1,6 +1,7 @@
 {
 	"game": {
-		"gravity": 25
+		"gravity": 25,
+		"entityScale": 1.0
 	},
 	"player": {
 		"spritesheet": "player.json",
@@ -14,5 +15,8 @@
 	"camera": {
 		"zoom": 4,
 		"lerp": 0.2
+	},
+	"objects": {
+		"keyPath": "key.json"
 	}
 }

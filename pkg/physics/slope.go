@@ -19,7 +19,7 @@ type Slope struct {
 // NewSlope returns a barebones line from A to B.
 func NewSlope(p1, p2 r.Vector2) *Slope {
 	return &Slope{
-		BasicShape: &BasicShape{},
+		BasicShape: NewBasicShape(),
 		p1:         p1,
 		p2:         p2,
 	}
@@ -186,10 +186,10 @@ func (l *Slope) GetIntersectionPoints(other Shape) []IntersectionPoint {
 }
 
 // Draw is used for debugging and draws a triangle.
-func (l *Slope) Draw(thickness float32, col r.Color) {
+func (l *Slope) Draw() {
 	// Draw the slope.
-	r.DrawLineEx(l.p1, l.p2, thickness, col)
+	r.DrawLineEx(l.p1, l.p2, 1, r.Green)
 	// Draw each side of the triangle.
-	r.DrawLineEx(l.p1, r.NewVector2(l.p2.X, l.p1.Y), thickness, col)
-	r.DrawLineEx(l.p2, r.NewVector2(l.p2.X, l.p1.Y), thickness, col)
+	r.DrawLineEx(l.p1, r.NewVector2(l.p2.X, l.p1.Y), 1, r.Green)
+	r.DrawLineEx(l.p2, r.NewVector2(l.p2.X, l.p1.Y), 1, r.Green)
 }

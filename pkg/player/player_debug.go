@@ -5,13 +5,15 @@ package player
 import (
 	"fmt"
 
+	"github.com/damienfamed75/rayrem/pkg/physics"
+
 	r "github.com/lachee/raylib-goplus/raylib"
 )
 
 // Draw is used to debug the game.
 // This function is only used when the game is ran in debug mode.
 func (p *Player) Draw() {
-	p.BasicEntity.Draw()
+	p.Actor.Draw()
 
 	r.DrawRectangleLines(
 		int(p.Position().X), int(p.Position().Y),
@@ -25,11 +27,44 @@ func (p *Player) Draw() {
 		5, r.White,
 	)
 
-	potential := p.solids.Retrieve(p.Rigidbody)
+	for i := range *p.Rigidbody.Space {
+		collider := (*p.Rigidbody.Space)[i].(*physics.Rectangle).Rectangle
+		possible := p.solids.Retrieve(collider.Move(
+			p.Velocity().X, p.Velocity().Y,
+		))
+
+		var tpossible []physics.Transformer
+		for _, pp := range possible {
+			if tt, ok := pp.(physics.Transformer); ok {
+				tpossible = append(tpossible, tt)
+			}
+		}
+
+		p.debugPotential(tpossible)
+	}
+}
+
+func (p *Player) debugPotential(potential []physics.Transformer) {
 	for _, obj := range potential {
-		r.DrawRectangleLinesEx(r.NewRectangle(
-			obj.Position().X, obj.Position().Y,
-			obj.MaxPosition().X-obj.Position().X, obj.MaxPosition().Y-obj.Position().Y,
-		), 1, r.Green)
+
+		if s, ok := obj.(*physics.Space); ok {
+			var tt []physics.Transformer
+			for i := range *s {
+				tt = append(tt, (*s)[i])
+			}
+
+			p.debugPotential(tt)
+
+			r.DrawRectangleLinesEx(r.NewRectangle(
+				obj.Position().X, obj.Position().Y,
+				obj.MaxPosition().X-obj.Position().X, obj.MaxPosition().Y-obj.Position().Y,
+			), 1, r.Blue)
+		} else {
+			r.DrawRectangleLinesEx(r.NewRectangle(
+				obj.Position().X, obj.Position().Y,
+				obj.MaxPosition().X-obj.Position().X, obj.MaxPosition().Y-obj.Position().Y,
+			), 1, r.Green)
+		}
+
 	}
 }

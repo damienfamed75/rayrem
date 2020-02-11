@@ -1,18 +1,19 @@
 {
+  "controls": {
+    "jump": 265,
+    "left": 263,
+    "right": 262,
+	"shoot": 67,
+	"interact": 69
+  },
   "screen": {
     "fullscreen": false,
-    "height": 960,
-    "width": 1280
+    "height": 1080,
+    "width": 1920
   },
   "volume": {
     "master": 0.12941177,
     "music": 1,
     "sound": 1
-  },
-  "controls": {
-	  "left": 263,
-	  "right": 262,
-	  "jump": 265,
-	  "shoot": 67
   }
 }

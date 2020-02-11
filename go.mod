@@ -3,6 +3,7 @@ module github.com/damienfamed75/rayrem
 go 1.13
 
 require (
+	github.com/Lachee/raylib-goplus v0.0.0-20200127004607-0ab9540a7320 // indirect
 	github.com/damienfamed75/aseprite v0.3.1
 	github.com/emirpasic/gods v1.12.0
 	github.com/gobuffalo/packr/v2 v2.7.1
