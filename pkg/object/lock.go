@@ -4,6 +4,8 @@ import (
 	"github.com/damienfamed75/rayrem/pkg/msg"
 )
 
+// Lock contains enough information to give to any Lockable items
+// to have a dynamic state lock.
 type Lock struct {
 	mailbox *msg.MessageManager
 	msgType string

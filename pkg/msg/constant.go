@@ -5,4 +5,5 @@ const (
 	Door = "door"
 	Open = "open"
 	Lock = "lock"
+	Key  = "key"
 )

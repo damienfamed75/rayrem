@@ -20,19 +20,22 @@ type Key struct {
 	position r.Vector2
 	zone     *physics.Zone
 	lock     *Lock
+	msgType  string
 	pickedUp bool
 
 	*common.BasicEntity
 }
 
 // NewKey returns a key with a default key sprite.
+// dest: position where the key should spawn.
 func NewKey(dest r.Vector2) (*Key, error) {
 	k := &Key{
 		position: dest,
+		msgType:  msg.Key,
 		lock: &Lock{
 			mailbox: &msg.MessageManager{},
 			msgType: msg.Lock,
-			locked:  true,
+			locked:  true, // Set the lock's state default to true.
 		},
 	}
 
@@ -41,34 +44,55 @@ func NewKey(dest r.Vector2) (*Key, error) {
 	if err != nil {
 		return nil, fmt.Errorf("loading spritesheet: %w", err)
 	}
-	ase.Play("idle")
+	ase.Play("idle") // Play default animation.
 
 	// Create basic entity to draw the key.
 	k.BasicEntity, err = common.NewBasicEntity(ase)
 	if err != nil {
 		return nil, fmt.Errorf("basic entity: %w", err)
 	}
-
+	// Create the zone that surrounds the sprite.
+	// The zone is used to tell if an entity is colliding with the key's sprite.
 	k.zone = physics.NewZone(
 		k.position.X, k.position.Y,
 		float32(k.Ase.FrameBoundaries().Width), float32(k.Ase.FrameBoundaries().Height),
-		k.lock.mailbox, k.lock.msgType,
+		k.lock.mailbox, k.msgType,
 	)
 
 	return k, nil
 }
 
+// Lock returns the key's lock.
+// Note: This can be used to give to Lockable objects.
+func (k *Key) Lock() *Lock {
+	return k.lock
+}
+
+// Add is a custom adding function to add the key's zone to the spatial hash
+// and then create a handler with its mailbox.
 func (k *Key) Add(w *physics.SpatialHashmap) {
 	w.Insert(k.zone)
 
-	k.lock.mailbox.ListenOnce(k.lock.msgType, func(m msg.Message) {
-		fmt.Println("picked up")
-		// remove zone.
-		w.Remove(k.zone)
-		k.pickedUp = true
+	// Create a listener in the key's mailbox to listen for collisions.
+	k.lock.mailbox.ListenOnce(k.msgType, func(m msg.Message) {
+		// Cast the message as a zone message.
+		if zm, ok := m.(*physics.ZoneMessage); ok {
+			// If the entity that's colliding with the zone is a player.
+			if zm.Entity.HasTags(common.TagPlayer) {
+				// remove zone.
+				w.Remove(k.zone)
+				k.pickedUp = true
+
+				// Send a message to the lock that it's now unlocked.
+				k.lock.mailbox.Dispatch(
+					msg.NewGenericMsg(k.lock.msgType, nil),
+				)
+			}
+		}
 	})
 }
 
+// Draw is used to draw the key's sprite.
 func (k *Key) Draw() {
 	if k.pickedUp == false {
 		srcX, srcY := k.Ase.FrameBoundaries().X, k.Ase.FrameBoundaries().Y
@@ -91,8 +115,4 @@ func (k *Key) Draw() {
 			k.Sprite, src, dest, r.NewVector2(0, 0), k.Rotation, k.Color,
 		)
 	}
-}
-
-func (k *Key) Lock() *Lock {
-	return k.lock
 }

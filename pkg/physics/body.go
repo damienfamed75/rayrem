@@ -129,9 +129,11 @@ func (b *Body) resolveShapes(col colCheck, original r.Vector2, collider, tmpXRec
 				},
 			)
 		case *Rectangle:
+			// Resolve the X collisions.
 			col.SetX(b.resolveRectangle(
 				t, tmpXRec, col.X(), b.velocity.X, r.NewVector2(1, 0),
 			))
+			// Resolve the Y collisions.
 			col.SetY(b.resolveRectangle(
 				t, tmpYRec, col.Y(), b.velocity.Y, r.NewVector2(0, 1),
 			))
