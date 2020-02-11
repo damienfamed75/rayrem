@@ -5,6 +5,7 @@ import (
 )
 
 var (
+	// Controls stores all the game controls in raylib Keys for easy use.
 	Controls controls
 )
 
@@ -16,6 +17,7 @@ type controls struct {
 	Interact r.Key
 }
 
+// loadControls is used after loading the public config file.
 func loadControls() {
 	Controls = controls{
 		Left:     r.Key(PublicConfig.GetInt32("controls.left")),
