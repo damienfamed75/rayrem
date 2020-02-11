@@ -55,10 +55,11 @@ func NewTestingScene(sceneManager common.SceneManager, player *player.Player, so
 		physics.NewRectangle(400, 200, 200, 200),
 
 		// Floating platforms.
-		physics.NewRectangle(96, 130, 40, 40),  // Left side
-		physics.NewRectangle(200, 130, 50, 40), // Right side
-		physics.NewPlatform(168, 160, 32, 10),  // floating platform.
+		physics.NewRectangle(96, 130, 40, 38),  // Left side
+		physics.NewRectangle(200, 130, 50, 38), // Right side
+		physics.NewPlatform(168, 163, 32, 5),   // floating platform.
 
+		// Elevated ground.
 		physics.NewRectangle(375, 180, 100, 20),
 
 		// Slope platform.
@@ -66,10 +67,10 @@ func NewTestingScene(sceneManager common.SceneManager, player *player.Player, so
 
 		// ground door.
 		object.NewDoor(
-			r.NewVector2(225, 170),
+			r.NewVector2(225, 168),
 			object.WithLock(key.Lock()),
 		),
-		// hatch
+		// hatch DEPRECATED
 		// object.NewDoor(
 		// 	r.NewRectangle(136, 160, 32, 10),
 		// 	r.NewRectangle(136, 150, 32, 30),

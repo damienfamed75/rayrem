@@ -53,6 +53,9 @@ func LoadConfig() error {
 		return fmt.Errorf("public: %w", err)
 	}
 
+	// update controls.
+	loadControls()
+
 	return nil
 }
 

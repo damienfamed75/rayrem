@@ -38,15 +38,17 @@ func (p *Player) Update(dt float32) {
 		p.Ase.Play("idle")
 	}
 
-	if r.IsKeyDown(r.KeyRight) {
+	// If the player is holding right.
+	if r.IsKeyDown(common.Controls.Right) {
 		p.AddVelocity(1, 0)
 	}
 
-	if r.IsKeyDown(r.KeyLeft) {
+	// If the player is holding left.
+	if r.IsKeyDown(common.Controls.Left) {
 		p.AddVelocity(-1, 0)
 	}
-
-	if r.IsKeyPressed(r.KeyUp) {
+	// If the player is trying to jump.
+	if r.IsKeyPressed(common.Controls.Jump) {
 		if p.Rigidbody.OnGround() {
 			p.SetVelocity(p.Velocity().X, -p.jumpHeight)
 		} else if !p.Rigidbody.OnGround() && !p.doubleJumpPerformed {

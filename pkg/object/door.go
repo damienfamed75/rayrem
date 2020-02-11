@@ -79,7 +79,8 @@ func (d *Door) Add(w *physics.SpatialHashmap) {
 
 	// Setup a mailbox to listen for door messages.
 	d.interactable.mailbox.Listen(d.interactable.msgType, func(m msg.Message) {
-		if !d.Lock.locked && r.IsKeyPressed(r.KeyE) {
+		// If the lock isn't locked and and the interact key is pressed.
+		if !d.Lock.locked && r.IsKeyPressed(common.Controls.Interact) {
 			zm := m.(*physics.ZoneMessage)
 			// If the colliding zone isn't the player, then ignore this message.
 			if !zm.Entity.HasTags(common.TagPlayer) {

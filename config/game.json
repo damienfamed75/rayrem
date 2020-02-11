@@ -3,7 +3,8 @@
     "jump": 265,
     "left": 263,
     "right": 262,
-    "shoot": 67
+	"shoot": 67,
+	"interact": 69
   },
   "screen": {
     "fullscreen": false,
